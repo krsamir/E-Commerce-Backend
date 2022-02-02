@@ -20,11 +20,21 @@ const User = sequelize.define(
     mobile: {
       type: DataTypes.STRING,
     },
-    dob: {
-      type: DataTypes.DATEONLY,
+    token: {
+      type: DataTypes.STRING,
+    },
+    validTill: {
+      type: DataTypes.DATE,
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+    },
+    invalidLogins: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: 5,
     },
   },
   {}
 );
-User.belongsTo(Address, { onDelete: "CASCADE" });
+User.hasMany(Address, { onDelete: "CASCADE" });
 export default User;
