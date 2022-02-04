@@ -4,6 +4,7 @@ import User from "../Model/User.js";
 import moment from "moment";
 import Sequelize from "sequelize";
 import env from "dotenv";
+import { AppConstant } from "../../Constants.js";
 env.config();
 const loginController = {};
 const { JWT_SECRET, JWT_EXPIRATION_TIME, FRONTENDLINK } = process.env;
@@ -23,7 +24,11 @@ loginController.register = async (req, res) => {
       token,
       validTill,
     });
-    res.send({ status: 1, message: "User Created." });
+    res.send({
+      status: 1,
+      message:
+        "An OTP has been sent to the registered email. Please verify before it expires.",
+    });
   } catch (error) {
     if (error instanceof Sequelize.BaseError) {
       res.status(500).send({
@@ -59,15 +64,20 @@ loginController.verification = async (req, res) => {
           }
         );
         const jwtToken = jwt.sign(
-          { id: data.id, email: data.username, role: "user" },
+          { id: data.id, email: data.username, role: AppConstant.ROLE.USER },
           JWT_SECRET,
           {
             expiresIn: JWT_EXPIRATION_TIME,
           }
         );
-        res.send({ status: 1, message: "accepted", token: jwtToken });
+        res.send({
+          status: 1,
+          message: "accepted",
+          token: jwtToken,
+          rid: AppConstant.ROLE.USER,
+        });
       } else {
-        res.send({ status: 0, message: "expired" });
+        res.send({ status: 0, message: "Token expired !!" });
       }
     } else {
       res.send({ status: 0, message: "Invalid Request!" });
@@ -109,7 +119,12 @@ loginController.login = async (req, res) => {
                 expiresIn: JWT_EXPIRATION_TIME,
               }
             );
-            res.send({ status: 1, message: "authenticated", token: jwtToken });
+            res.send({
+              status: 1,
+              message: "Authenticated!!",
+              token: jwtToken,
+              rid: AppConstant.ROLE.USER,
+            });
           } else {
             await User.increment(
               { invalidLogins: -1 },
@@ -141,13 +156,17 @@ loginController.resetPassword = async (req, res) => {
   const token = Math.random().toString().substring(2, 8);
   const validTill = moment().add(10, "minute").format("YYYY-MM-DD HH:mm:ss");
   try {
-    await User.update(
+    const [value] = await User.update(
       { token, validTill, isActive: false, invalidLogins: 5, password: null },
       {
         where: { username: email },
       }
     );
-    res.send({ status: 1, message: "OTP has been sent to your email." });
+    if (value === 1) {
+      res.send({ status: 1, message: "OTP has been sent to your email." });
+    } else {
+      res.send({ status: 0, message: "Please register with us first." });
+    }
   } catch (error) {
     console.log(error);
     res.send({ status: 0, message: "Some issue while performing actions." });
@@ -170,15 +189,38 @@ loginController.resetPasswordFinal = async (req, res) => {
         where: { username: email, token },
       }
     );
-    console.log(value);
     if (value === 1) {
-      res.send({ status: 1, message: "Updated Successfully." });
+      res.send({ status: 1, message: "Password Updated Successfully." });
     } else {
       res.send({ status: 0, message: "Some issue while changing password." });
     }
   } catch (error) {
     console.log(error);
     res.send({ status: 0, message: "Some issue while performing actions." });
+  }
+};
+
+loginController.resetPasswordVerification = async (req, res) => {
+  const { username, token } = req.body;
+  try {
+    const user = await User.findOne({
+      where: { username, token },
+      attributes: ["validTill", "username", "id"],
+    });
+    if (user) {
+      const data = user.toJSON();
+      const expiry = moment(data.validTill);
+      if (moment().isSameOrBefore(moment(expiry))) {
+        res.send({ status: 1, message: "accepted" });
+      } else {
+        res.send({ status: 0, message: "Token expired !!" });
+      }
+    } else {
+      res.send({ status: 0, message: "Invalid Request!" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.send({ status: 0, message: "Some issue with the request." });
   }
 };
 export default loginController;

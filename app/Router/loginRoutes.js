@@ -9,11 +9,16 @@ const limiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes
   max: 10,
 });
-
-router.get("/login", loginController.login);
+const limiterfor5minutes = rateLimit({
+  windowMs: 10 * 60 * 1000, // 5 minutes
+  max: 5,
+});
+router.post("/login", loginController.login);
 router.use(limiter);
-router.get("/register", loginController.register);
-router.get("/verify", loginController.verification);
-router.get("/reset", loginController.resetPassword);
-router.get("/reset/final", loginController.resetPasswordFinal);
+router.post("/register", loginController.register);
+router.post("/verify", loginController.verification);
+router.use(limiterfor5minutes);
+router.post("/reset", loginController.resetPassword);
+router.post("/reset/final", loginController.resetPasswordFinal);
+router.post("/reset/verify", loginController.resetPasswordVerification);
 export default router;
