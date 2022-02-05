@@ -5,6 +5,8 @@ import moment from "moment";
 import Sequelize from "sequelize";
 import env from "dotenv";
 import { AppConstant } from "../../Constants.js";
+import Email from "../../Email/email.js";
+import sequelize from "../Database.js";
 env.config();
 const loginController = {};
 const { JWT_SECRET, JWT_EXPIRATION_TIME, FRONTENDLINK } = process.env;
@@ -15,19 +17,36 @@ loginController.register = async (req, res) => {
   const token = Math.random().toString().substring(2, 8);
   const validTill = moment().add(10, "minute").format("YYYY-MM-DD HH:mm:ss");
   try {
-    await User.create({
-      name,
-      username,
-      password: hashedPassword,
-      mobile,
-      isActive: false,
-      token,
-      validTill,
-    });
-    res.send({
-      status: 1,
-      message:
-        "An OTP has been sent to the registered email. Please verify before it expires.",
+    const t = await sequelize.transaction();
+    await User.create(
+      {
+        name,
+        username,
+        password: hashedPassword,
+        mobile,
+        isActive: false,
+        token,
+        validTill,
+      },
+      { transaction: t }
+    );
+    const emailObject = { name, recipient: username, token, validTill };
+    Email.registerMail(emailObject, async (data) => {
+      if (data === 1) {
+        await t.commit();
+        res.send({
+          status: 1,
+          message:
+            "An OTP has been sent to the registered email. Please verify before it expires.",
+        });
+      } else {
+        await t.rollback();
+        res.status(500).send({
+          status: 0,
+          message: "Some issue while Sending Mail.",
+          reason: "Mail not Sent",
+        });
+      }
     });
   } catch (error) {
     if (error instanceof Sequelize.BaseError) {
@@ -156,14 +175,29 @@ loginController.resetPassword = async (req, res) => {
   const token = Math.random().toString().substring(2, 8);
   const validTill = moment().add(10, "minute").format("YYYY-MM-DD HH:mm:ss");
   try {
+    const t = await sequelize.transaction();
     const [value] = await User.update(
       { token, validTill, isActive: false, invalidLogins: 5, password: null },
       {
         where: { username: email },
-      }
+      },
+      { transaction: t }
     );
     if (value === 1) {
-      res.send({ status: 1, message: "OTP has been sent to your email." });
+      const emailObject = { recipient: email, token, validTill };
+      Email.forgotPassword(emailObject, async (data) => {
+        if (data === 1) {
+          await t.commit();
+          res.send({ status: 1, message: "OTP has been sent to your email." });
+        } else {
+          await t.rollback();
+          res.send({
+            status: 0,
+            message: "Some issue while Sending Mail.",
+            reason: "Mail not Sent",
+          });
+        }
+      });
     } else {
       res.send({ status: 0, message: "Please register with us first." });
     }
