@@ -5,7 +5,7 @@ const { FRONTENDLINK, MAIL_USER } = process.env;
 const Email = {};
 
 Email.registerBody = (name, recipient, token, validTill) => {
-  const url = `${FRONTENDLINK}/verify?token=${token}&email=${recipient}`;
+  const url = `${FRONTENDLINK}/verify?token=${token}&email=${recipient}&flag=true`;
   const decodedUrl = decodeURIComponent(url);
   const htmlOutput = mjml2html(
     `<mjml>
@@ -52,7 +52,7 @@ Email.registerBody = (name, recipient, token, validTill) => {
 };
 
 Email.forgotPassword = (recipient, token, validTill) => {
-  const url = `${FRONTENDLINK}/verify?token=${token}&email=${recipient}`;
+  const url = `${FRONTENDLINK}/verify?token=${token}&email=${recipient}&flag=false`;
   const decodedUrl = decodeURIComponent(url);
   const htmlOutput = mjml2html(
     `<mjml>
