@@ -3,7 +3,9 @@ import env from "dotenv";
 import loginRoutes from "./app/Router/loginRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
+// import bcryptjs from "bcryptjs";
 env.config();
+// eslint-disable-next-line no-undef
 const { PORT } = process.env;
 const app = express();
 
@@ -18,6 +20,11 @@ app.use((req, res, next) => {
   }
   next();
 });
+// app.get("/", (req, res) => {
+//   var salt = bcryptjs.genSaltSync(10);
+//   var password = bcryptjs.hashSync("admin", salt);
+//   res.send({ password });
+// });
 app.use("/auth", loginRoutes);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

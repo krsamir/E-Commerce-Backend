@@ -4,6 +4,7 @@ import EmailBody from "./emailbody.js";
 const Email = {};
 Email.registerMail = async (data, sentStatus) => {
   const { name, recipient, token, validTill } = data;
+  // eslint-disable-next-line no-undef
   const { MAIL_USER } = process.env;
   var mailOptions = {
     from: MAIL_USER,
@@ -23,6 +24,7 @@ Email.registerMail = async (data, sentStatus) => {
 
 Email.forgotPassword = async (data, sentStatus) => {
   const { recipient, token, validTill } = data;
+  // eslint-disable-next-line no-undef
   const { MAIL_USER } = process.env;
   var mailOptions = {
     from: MAIL_USER,

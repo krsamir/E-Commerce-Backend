@@ -9,7 +9,8 @@ import Email from "../../Email/email.js";
 import sequelize from "../Database.js";
 env.config();
 const loginController = {};
-const { JWT_SECRET, JWT_EXPIRATION_TIME, FRONTENDLINK } = process.env;
+// eslint-disable-next-line no-undef
+const { JWT_SECRET, JWT_EXPIRATION_TIME } = process.env;
 loginController.register = async (req, res) => {
   const { name, username, mobile, password } = req.body;
   var salt = bcryptjs.genSaltSync(10);

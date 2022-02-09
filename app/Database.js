@@ -8,6 +8,7 @@ const {
   MYSQLPORT,
   MYSQLUSER,
   TIMEZONE,
+  // eslint-disable-next-line no-undef
 } = process.env;
 const sequelize = new Sequelize(MYSQLDATABASE, MYSQLUSER, MYSQLPASSWORD, {
   host: MYSQLHOST,

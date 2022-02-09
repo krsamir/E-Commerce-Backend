@@ -1,6 +1,7 @@
 import mjml2html from "mjml";
 import env from "dotenv";
 env.config();
+// eslint-disable-next-line no-undef
 const { FRONTENDLINK, MAIL_USER } = process.env;
 const Email = {};
 

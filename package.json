@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "lint": "eslint ./"
   },
   "repository": {
     "type": "git",
@@ -49,5 +50,8 @@
     "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
       "prettier --write"
     ]
+  },
+  "devDependencies": {
+    "eslint": "^8.8.0"
   }
 }
