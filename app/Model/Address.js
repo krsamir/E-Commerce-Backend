@@ -16,7 +16,7 @@ const Address = sequelize.define(
       type: DataTypes.STRING,
     },
     area: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING,
     },
     landmark: {
       type: DataTypes.STRING,

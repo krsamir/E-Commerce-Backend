@@ -1,6 +1,7 @@
 import express from "express";
 import env from "dotenv";
 import loginRoutes from "./app/Router/loginRoutes.js";
+import userRoutes from "./app/Router/userRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 // import bcryptjs from "bcryptjs";
@@ -13,7 +14,7 @@ app.use(express.json());
 
 app.use((req, res, next) => {
   const { url, method } = req;
-  if (url.match("/api") || url.match("/auth")) {
+  if (url.match("/user") || url.match("/auth")) {
     console.log(
       `[ METHOD: ${method}  ROUTE: ${url} at ${new Date().toLocaleString()} ]`
     );
@@ -26,6 +27,7 @@ app.use((req, res, next) => {
 //   res.send({ password });
 // });
 app.use("/auth", loginRoutes);
+app.use("/user", userRoutes);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, "./dist")));
