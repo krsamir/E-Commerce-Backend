@@ -1,12 +1,15 @@
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../Model/User.js";
+import Admin from "../Model/Admin.js";
 import moment from "moment";
 import Sequelize from "sequelize";
 import env from "dotenv";
 import { AppConstant } from "../../Constants.js";
 import Email from "../../Email/email.js";
 import sequelize from "../Database.js";
+import Parties from "../Model/Parties.js";
+import Role from "../Model/Role.js";
 env.config();
 const loginController = {};
 // eslint-disable-next-line no-undef
@@ -120,11 +123,14 @@ loginController.login = async (req, res) => {
           res.send({
             status: 0,
             message:
-              "Your account is temprorarly blocked due multiple invalid logins. Please reset your password.",
+              "Your account is temprorarly blocked due to multiple invalid logins. Please reset your password.",
           });
         } else {
           const hashedPassword = data.password;
-          const ismatched = bcryptjs.compareSync(password, hashedPassword);
+          const ismatched = bcryptjs.compareSync(
+            password,
+            hashedPassword ? hashedPassword : ""
+          );
           if (ismatched) {
             await User.update(
               { lastLogin: moment(), invalidLogins: 5 },
@@ -133,7 +139,11 @@ loginController.login = async (req, res) => {
               }
             );
             const jwtToken = jwt.sign(
-              { id: data.id, email: data.username, role: "user" },
+              {
+                id: data.id,
+                email: data.username,
+                role: AppConstant.ROLE.USER,
+              },
               JWT_SECRET,
               {
                 expiresIn: JWT_EXPIRATION_TIME,
@@ -256,6 +266,61 @@ loginController.resetPasswordVerification = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.send({ status: 0, message: "Some issue with the request." });
+  }
+};
+
+loginController.adminLogin = async (req, res, next) => {
+  const { username, password } = req.body;
+  try {
+    const admin = await Admin.findOne({
+      where: { username },
+      include: [Parties, Role],
+    });
+    if (admin) {
+      const data = admin.toJSON();
+      const isMatched = bcryptjs.compareSync(
+        password,
+        data.password ? data.password : ""
+      );
+      if (data.isActive) {
+        if (isMatched) {
+          await Admin.update(
+            { lastLogin: moment() },
+            {
+              where: { id: data.id },
+            }
+          );
+          const jwtToken = jwt.sign(
+            {
+              id: data.id,
+              email: data.username,
+              role: AppConstant.ROLE.ADMIN,
+            },
+            JWT_SECRET,
+            {
+              expiresIn: JWT_EXPIRATION_TIME,
+            }
+          );
+          res.send({
+            status: 1,
+            message: "Authenticated!!",
+            token: jwtToken,
+            rid: AppConstant.ROLE.ADMIN,
+          });
+        } else {
+          res.send({ status: 0, message: "Invalid Credentials" });
+        }
+      } else {
+        res.send({
+          status: 0,
+          message: "Please contact Admin and Active your account",
+        });
+      }
+    } else {
+      res.send({ status: 0, message: "Invalid Credentials" });
+    }
+  } catch (e) {
+    next(e);
   }
 };
 export default loginController;

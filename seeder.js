@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 import _yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import Task from "./DatabaseScript.js";
@@ -26,6 +28,22 @@ yargs.command({
   describe: "Create User Table",
   handler(argv) {
     Task.addUserTable();
+  },
+});
+
+yargs.command({
+  command: "addRole",
+  describe: "Create Role Table & Populate data",
+  handler(argv) {
+    Task.addRole();
+  },
+});
+
+yargs.command({
+  command: "addParty",
+  describe: "Create Party Table & Populate data",
+  handler(argv) {
+    Task.addParty();
   },
 });
 

@@ -1,5 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../Database.js";
+import Parties from "./Parties.js";
+import Role from "./Role.js";
 
 const Admin = sequelize.define(
   "Admin",
@@ -21,8 +23,12 @@ const Admin = sequelize.define(
     mobile: {
       type: DataTypes.STRING,
     },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+    },
   },
   {}
 );
-
+Admin.belongsTo(Role);
+Admin.belongsTo(Parties);
 export default Admin;

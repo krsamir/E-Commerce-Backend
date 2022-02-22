@@ -11,6 +11,7 @@ const limiterfor5minutes = rateLimit({
   max: 5,
 });
 router.post("/login", loginController.login);
+router.post("/admin/login", loginController.adminLogin);
 router.use(limiter);
 router.post("/register", loginController.register);
 router.post("/verify", loginController.verification);

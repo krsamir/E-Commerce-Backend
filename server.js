@@ -28,6 +28,11 @@ app.use((req, res, next) => {
 // });
 app.use("/auth", loginRoutes);
 app.use("/user", userRoutes);
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).send({ status: 0, message: "Caught into some issue" });
+});
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, "./dist")));
