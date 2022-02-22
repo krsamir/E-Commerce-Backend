@@ -294,7 +294,10 @@ loginController.adminLogin = async (req, res, next) => {
             {
               id: data.id,
               email: data.username,
-              role: AppConstant.ROLE.ADMIN,
+              role:
+                data.Role.role === "ADMIN"
+                  ? AppConstant.ROLE.ADMIN
+                  : AppConstant.ROLE.SHIPMENT,
             },
             JWT_SECRET,
             {
@@ -305,7 +308,10 @@ loginController.adminLogin = async (req, res, next) => {
             status: 1,
             message: "Authenticated!!",
             token: jwtToken,
-            rid: AppConstant.ROLE.ADMIN,
+            rid:
+              data.Role.role === "ADMIN"
+                ? AppConstant.ROLE.ADMIN
+                : AppConstant.ROLE.SHIPMENT,
           });
         } else {
           res.send({ status: 0, message: "Invalid Credentials" });
