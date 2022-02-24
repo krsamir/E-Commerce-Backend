@@ -15,7 +15,7 @@ const sequelize = new Sequelize(MYSQLDATABASE, MYSQLUSER, MYSQLPASSWORD, {
   port: MYSQLPORT,
   timezone: TIMEZONE,
   dialect: "mysql",
-  logging: false,
+  // logging: true,
 });
 
 sequelize

@@ -4,4 +4,7 @@ export const AppConstant = Object.freeze({
     USER: "1643951347925",
     SHIPMENT: "1645361933757",
   },
+  IMAGES: {
+    PROFILE: "PROFILE",
+  },
 });

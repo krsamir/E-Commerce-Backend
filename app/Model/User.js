@@ -30,7 +30,7 @@ const User = sequelize.define(
       type: DataTypes.BOOLEAN,
     },
     invalidLogins: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.INTEGER,
       defaultValue: 5,
     },
   },

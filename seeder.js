@@ -8,45 +8,76 @@ const yargs = _yargs(hideBin(process.argv));
 yargs.version("1.1.0");
 
 yargs.command({
-  command: "addadmin",
-  describe: "Create Admin Table",
-  handler(argv) {
-    Task.addAdminTable();
-  },
-});
-
-yargs.command({
-  command: "addaddress",
-  describe: "Create Address Table",
+  command: "1",
+  describe: "1. Create Address Table",
   handler(argv) {
     Task.addAddressTable();
   },
 });
 
 yargs.command({
-  command: "adduser",
-  describe: "Create User Table",
+  command: "2",
+  describe: "2. Create User Table",
   handler(argv) {
     Task.addUserTable();
   },
 });
 
 yargs.command({
-  command: "addRole",
-  describe: "Create Role Table & Populate data",
+  command: "3",
+  describe: "3. Create Role Table & Populate data",
   handler(argv) {
     Task.addRole();
   },
 });
 
 yargs.command({
-  command: "addParty",
-  describe: "Create Party Table & Populate data",
+  command: "4",
+  describe: "4. Create Party Table & Populate data",
   handler(argv) {
     Task.addParty();
   },
 });
 
+yargs.command({
+  command: "5",
+  describe: "5. Create Admin Table",
+  handler(argv) {
+    Task.addAdminTable();
+  },
+});
+
+yargs.command({
+  command: "6",
+  describe: "6. Create Category Table",
+  handler(argv) {
+    Task.addCategory();
+  },
+});
+
+yargs.command({
+  command: "7",
+  describe: "7. Create Product Table",
+  handler(argv) {
+    Task.addProduct();
+  },
+});
+
+yargs.command({
+  command: "8",
+  describe: "8. Create Image Table",
+  handler(argv) {
+    Task.addImages();
+  },
+});
+
+yargs.command({
+  command: "9",
+  describe: "9.Product Category Junction Table",
+  handler(argv) {
+    Task.productCategoryJunction();
+  },
+});
 // yargs.command({
 //     command: "addadmin",
 //     describe: "Create Admin Table",
