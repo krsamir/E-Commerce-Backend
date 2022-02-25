@@ -8,18 +8,21 @@ import { fileURLToPath } from "url";
 // import bcryptjs from "bcryptjs";
 env.config();
 // eslint-disable-next-line no-undef
-const { PORT } = process.env;
+const { PORT, NODE_ENV } = process.env;
 const app = express();
 
 app.use(express.json());
 
 app.use((req, res, next) => {
-  const { url, method } = req;
+  const { url, method, body } = req;
   if (url.match("/user") || url.match("/auth") || url.match("/product")) {
     console.log(
       `[ METHOD: ${method}  ROUTE: ${url} at ${new Date().toLocaleString()} ]`
     );
   }
+  NODE_ENV === "development" &&
+    method !== "GET" &&
+    console.log("PAYLOAD: ", body);
   next();
 });
 // app.get("/", (req, res) => {
