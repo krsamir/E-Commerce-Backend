@@ -80,7 +80,7 @@ Task.addImages = () => {
 };
 
 Task.addCategory = () => {
-  Category.sync()
+  Category.sync({ alter: true })
     .then(() => {
       log(`Category Table Created.`);
     })

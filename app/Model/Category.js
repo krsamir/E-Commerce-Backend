@@ -6,6 +6,9 @@ const Category = sequelize.define(
     name: {
       type: DataTypes.STRING,
     },
+    description: {
+      type: DataTypes.STRING,
+    },
   },
   {}
 );
