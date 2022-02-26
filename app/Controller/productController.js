@@ -1,4 +1,7 @@
 import Category from "../Model/Category.js";
+import Images from "../Model/Images.js";
+import Products from "../Model/Product.js";
+import ProductCategory from "../Model/ProductCategory.js";
 
 const productController = {};
 
@@ -57,6 +60,21 @@ productController.deleteCategory = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.send({ status: 0, message: "Some issue while deleting Category." });
+  }
+};
+
+productController.getProduct = async (req, res) => {
+  try {
+    const products = await Products.findAll({
+      include: [
+        { model: Category, through: ProductCategory },
+        { model: Images },
+      ],
+    });
+    res.send({ status: 1, message: "", data: products });
+  } catch (error) {
+    res.send({ status: 0, message: "Some issue while getting products." });
+    console.log(error);
   }
 };
 export default productController;

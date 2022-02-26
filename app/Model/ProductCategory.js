@@ -20,11 +20,9 @@ const ProductCategory = sequelize.define("ProductCategory", {
   },
 });
 Category.belongsToMany(Product, {
-  through: ProductCategory,
-  onDelete: "CASCADE",
+  through: "ProductCategory",
 });
 Product.belongsToMany(Category, {
-  through: ProductCategory,
-  onDelete: "CASCADE",
+  through: "ProductCategory",
 });
 export default ProductCategory;

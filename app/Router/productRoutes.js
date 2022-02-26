@@ -4,7 +4,9 @@ import { isAdmin } from "../MiddleWares/Authorization.js";
 import productController from "../Controller/productController.js";
 const router = express.Router();
 
+router.get("/", productController.getProduct);
 router.use(isAuthenticated);
+
 router.use(isAdmin);
 router.get("/category", productController.getAllCategory);
 router.post("/category", productController.createCategory);

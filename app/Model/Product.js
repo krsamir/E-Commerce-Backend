@@ -10,6 +10,12 @@ const Product = sequelize.define(
     description: {
       type: DataTypes.STRING,
     },
+    color: {
+      type: DataTypes.STRING,
+    },
+    material: {
+      type: DataTypes.STRING,
+    },
     offerprice: {
       type: DataTypes.INTEGER,
     },
@@ -27,6 +33,10 @@ const Product = sequelize.define(
     },
     keepinstocktill: {
       type: DataTypes.DATEONLY,
+    },
+    itemsold: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
   },
   {}

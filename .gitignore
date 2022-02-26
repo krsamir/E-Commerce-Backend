@@ -3,3 +3,4 @@
 *.vscode*
 /EmailBodyLocal
 /images
+/seedData.js
