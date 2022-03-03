@@ -103,7 +103,7 @@ productController.getAllProduct = async (req, res) => {
   let { page } = req.query;
   page = isNaN(page) ? 1 : Number(page);
   try {
-    const products = await Products.findAndCountAll({
+    const products = await Products.findAll({
       attributes: ["name", "offerprice", "actualprice", "productCode"],
       include: [{ model: Images }],
       where: {
