@@ -38,6 +38,10 @@ const Product = sequelize.define(
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
+    productCode: {
+      type: DataTypes.STRING,
+      unique: true,
+    },
   },
   {}
 );
