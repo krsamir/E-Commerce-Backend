@@ -100,14 +100,18 @@ productController.getProduct = async (req, res) => {
 };
 
 productController.getAllProduct = async (req, res) => {
+  let { page } = req.query;
+  page = isNaN(page) ? 1 : Number(page);
   try {
-    const products = await Products.findAll({
+    const products = await Products.findAndCountAll({
       attributes: ["id", "name", "offerprice", "actualprice"],
       include: [{ model: Images }],
       where: {
         isActive: 1,
         keepinstocktill: { [Op.gte]: Date.now() },
       },
+      offset: (page - 1) * 10,
+      limit: 10,
     });
     res.send({ status: 1, message: "", data: products });
   } catch (error) {
