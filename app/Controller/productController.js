@@ -101,17 +101,34 @@ productController.getProduct = async (req, res) => {
 
 productController.getAllProduct = async (req, res) => {
   let { page } = req.query;
-  page = isNaN(page) ? 1 : Number(page);
+  page = isNaN(page) || Number(page) <= 0 ? 1 : Number(page);
   try {
     const products = await Products.findAll({
       attributes: ["name", "offerprice", "actualprice", "productCode"],
       include: [{ model: Images }],
+      order: [["id", "DESC"]],
       where: {
         isActive: 1,
-        keepinstocktill: { [Op.gte]: Date.now() },
+        [Op.or]: [
+          { keepinstocktill: { [Op.gte]: Date.now() } },
+          { keepinstocktill: null },
+        ],
       },
       offset: (page - 1) * 10,
       limit: 10,
+    });
+    res.send({ status: 1, message: "", data: products });
+  } catch (error) {
+    res.send({ status: 0, message: "Some issue while getting products." });
+    console.log(error);
+  }
+};
+
+productController.getAllProductForAdmin = async (req, res) => {
+  try {
+    const products = await Products.findAll({
+      include: { all: true },
+      order: [["id", "DESC"]],
     });
     res.send({ status: 1, message: "", data: products });
   } catch (error) {
