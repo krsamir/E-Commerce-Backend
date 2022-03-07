@@ -136,4 +136,9 @@ productController.getAllProductForAdmin = async (req, res) => {
     console.log(error);
   }
 };
+
+productController.uploadImage = (req, res) => {
+  console.log(req.files);
+  res.send({ data: "images" });
+};
 export default productController;

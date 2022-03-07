@@ -5,13 +5,20 @@ import userRoutes from "./app/Router/userRoutes.js";
 import productRoutes from "./app/Router/productRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
+
 // import bcryptjs from "bcryptjs";
 env.config();
 // eslint-disable-next-line no-undef
 const { PORT, NODE_ENV } = process.env;
 const app = express();
 
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// app.post("/images", (req, res) => {
+//   console.log(req);
+//   res.send({ data: "Images" });
+// });
 
 app.use((req, res, next) => {
   const { url, method, body } = req;
