@@ -239,4 +239,50 @@ productController.updateProduct = async (req, res, next) => {
     next(error);
   }
 };
+
+productController.createProductCategory = async (req, res, next) => {
+  const { ProductId, CategoryId } = req.body;
+  try {
+    const data = await ProductCategory.create({ ProductId, CategoryId });
+    if (data) {
+      res.send({
+        status: 1,
+        message: `Product added to category successfully.`,
+      });
+    } else {
+      res.send({
+        status: 0,
+        message: `Some issue while adding the product to this category.`,
+      });
+    }
+  } catch (error) {
+    if (error.name === "SequelizeUniqueConstraintError") {
+      res.send({
+        status: 0,
+        message: `Product has been already added into this Category.`,
+      });
+    } else {
+      next(error);
+    }
+  }
+};
+
+productController.deleteProductCategory = async (req, res, next) => {
+  const { ProductId, CategoryId } = req.body;
+  try {
+    const data = await ProductCategory.destroy({
+      where: { ProductId, CategoryId },
+    });
+    if (data > 0) {
+      res.send({ status: 1, message: "Category deleted successfully." });
+    } else {
+      res.send({
+        status: 1,
+        message: "Some issue while deleting category for this product",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 export default productController;

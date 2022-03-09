@@ -41,5 +41,8 @@ router.get("/admin/getAllProduct", productController.getAllProductForAdmin);
 // Product API'S
 router.post("/create", productController.createProduct);
 router.put("/update", productController.updateProduct);
+// Product Category API's
+router.post("/createProCat", productController.createProductCategory);
+router.delete("/deleteProCat", productController.deleteProductCategory);
 
 export default router;
