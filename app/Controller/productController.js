@@ -141,4 +141,102 @@ productController.uploadImage = (req, res) => {
   console.log(req.files);
   res.send({ data: "images" });
 };
+
+productController.createProduct = async (req, res, next) => {
+  const {
+    color,
+    description,
+    isActive,
+    itemsold,
+    keepinstocktill,
+    material,
+    name,
+    offerprice,
+    productCode,
+    totalstocks,
+    actualprice,
+  } = req.body;
+  try {
+    const product = await Products.create({
+      actualprice,
+      color,
+      description,
+      isActive,
+      itemsold,
+      keepinstocktill,
+      material,
+      name,
+      offerprice,
+      productCode,
+      totalstocks,
+      createdby: req.email,
+    });
+    if (product) {
+      res.send({
+        status: 1,
+        message: "Product Created successfully!",
+        data: product,
+      });
+    } else {
+      res.send({
+        status: 0,
+        message: "Some issue while creating the product.",
+      });
+    }
+  } catch (error) {
+    if (error.name === "SequelizeUniqueConstraintError") {
+      res.send({
+        status: 0,
+        message: "Some issue while creating the product.",
+        error: error.errors[0].message,
+      });
+    } else {
+      next(error);
+    }
+  }
+};
+
+productController.updateProduct = async (req, res, next) => {
+  const {
+    id,
+    actualprice,
+    color,
+    description,
+    isActive,
+    itemsold,
+    keepinstocktill,
+    material,
+    name,
+    offerprice,
+    productCode,
+    totalstocks,
+  } = req.body;
+
+  try {
+    const [status] = await Products.update(
+      {
+        color,
+        actualprice,
+        description,
+        isActive,
+        itemsold,
+        keepinstocktill,
+        material,
+        name,
+        offerprice,
+        productCode,
+        totalstocks,
+        createdby: req.email,
+      },
+      { where: { id } }
+    );
+    if (status) {
+      res.send({ status: 1, message: `Product-${name} Updated Successfully.` });
+    } else {
+      res.send({ status: 0, message: "Some issue while updating Product." });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 export default productController;

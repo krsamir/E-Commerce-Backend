@@ -32,10 +32,14 @@ router.get("/item/:id", productController.getProduct);
 router.use(isAuthenticated);
 
 router.use(isAdmin);
+// Category API'S
 router.get("/category", productController.getAllCategory);
 router.post("/category", productController.createCategory);
 router.put("/category", productController.updateCategory);
 router.delete("/category", productController.deleteCategory);
 router.get("/admin/getAllProduct", productController.getAllProductForAdmin);
+// Product API'S
+router.post("/create", productController.createProduct);
+router.put("/update", productController.updateProduct);
 
 export default router;
