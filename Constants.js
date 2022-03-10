@@ -7,4 +7,8 @@ export const AppConstant = Object.freeze({
   IMAGES: {
     PROFILE: "PROFILE",
   },
+  CATEGORIES: {
+    ALL: "ALL",
+    PROFILE: "PROFILE",
+  },
 });

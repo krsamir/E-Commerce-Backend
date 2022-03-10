@@ -2,10 +2,15 @@ import Category from "../Model/Category.js";
 import Images from "../Model/Images.js";
 import Products from "../Model/Product.js";
 import ProductCategory from "../Model/ProductCategory.js";
+import { AppConstant } from "../../Constants.js";
 import { Op } from "sequelize";
+import { fileURLToPath } from "url";
+import path from "path";
+import fs from "fs";
 
 const productController = {};
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 productController.getAllCategory = async (req, res) => {
   try {
     const categories = await Category.findAll();
@@ -99,13 +104,22 @@ productController.getProduct = async (req, res) => {
   }
 };
 
-productController.getAllProduct = async (req, res) => {
+productController.getAllProductbyPage = async (req, res) => {
   let { page } = req.query;
   page = isNaN(page) || Number(page) <= 0 ? 1 : Number(page);
   try {
     const products = await Products.findAll({
       attributes: ["name", "offerprice", "actualprice", "productCode"],
-      include: [{ model: Images }],
+      include: [
+        {
+          model: Images,
+          attributes: ["filename", "filetype"],
+          required: false,
+          where: {
+            category: AppConstant.CATEGORIES.PROFILE,
+          },
+        },
+      ],
       order: [["id", "DESC"]],
       where: {
         isActive: 1,
@@ -117,7 +131,25 @@ productController.getAllProduct = async (req, res) => {
       offset: (page - 1) * 10,
       limit: 10,
     });
-    res.send({ status: 1, message: "", data: products });
+
+    const parsedProduct = JSON.parse(JSON.stringify(products));
+    const mappedProduct = parsedProduct.map((val) => {
+      return {
+        ...val,
+        Images: val.Images.map((val) => {
+          try {
+            const fileData = fs.readFileSync(
+              `${path.join(__dirname, "../../Images/", val.filename)}`,
+              "base64"
+            );
+            return { file: val.filename, data: fileData };
+          } catch (error) {
+            return { file: null, data: null };
+          }
+        }),
+      };
+    });
+    res.send({ status: 1, message: "", data: mappedProduct });
   } catch (error) {
     res.send({ status: 0, message: "Some issue while getting products." });
     console.log(error);
@@ -137,9 +169,32 @@ productController.getAllProductForAdmin = async (req, res) => {
   }
 };
 
-productController.uploadImage = (req, res) => {
-  console.log(req.files);
-  res.send({ data: "images" });
+productController.uploadImage = async (req, res, next) => {
+  const files = req.files;
+  const data = JSON.parse(JSON.stringify(req.body));
+  const { ProductId } = data;
+  if (files.length === 0) {
+    res.send({ status: 0, message: "No files to upload" });
+  } else {
+    try {
+      const finalFileObject = files.map(({ filename, size, mimetype }) => ({
+        filename,
+        filetype: mimetype,
+        size,
+        category: AppConstant.CATEGORIES.ALL,
+        ProductId,
+      }));
+      const createdData = await Images.bulkCreate(finalFileObject);
+
+      res.send({
+        status: 1,
+        message: "Image uploaded successfully!!",
+        data: createdData,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 };
 
 productController.createProduct = async (req, res, next) => {
@@ -147,22 +202,20 @@ productController.createProduct = async (req, res, next) => {
     color,
     description,
     isActive,
-    itemsold,
     keepinstocktill,
     material,
     name,
     offerprice,
-    productCode,
     totalstocks,
     actualprice,
   } = req.body;
   try {
+    const productCode = Math.random().toString(36).slice(2);
     const product = await Products.create({
       actualprice,
       color,
       description,
       isActive,
-      itemsold,
       keepinstocktill,
       material,
       name,
@@ -281,6 +334,33 @@ productController.deleteProductCategory = async (req, res, next) => {
         message: "Some issue while deleting category for this product",
       });
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+productController.getImagesById = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const data = await Products.findAll({ where: { id }, include: "Images" });
+    const image = JSON.parse(JSON.stringify(data));
+    const mappedImage = image.map((val) => {
+      return {
+        ...val,
+        Images: val.Images.map((val) => {
+          try {
+            const fileData = fs.readFileSync(
+              `${path.join(__dirname, "../../Images/", val.filename)}`,
+              "base64"
+            );
+            return { file: val.filename, data: fileData };
+          } catch (error) {
+            return { file: val.filename, data: null };
+          }
+        }),
+      };
+    });
+    res.send({ images: "", data: mappedImage });
   } catch (error) {
     next(error);
   }

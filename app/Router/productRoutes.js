@@ -10,24 +10,7 @@ const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-/**
- * Image Uploads
- */
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, "../../Images"));
-  },
-  filename: function (req, file, cb) {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
-const upload = multer({ storage: storage });
-router.post(
-  "/images",
-  upload.array("images[]", 12),
-  productController.uploadImage
-);
-router.get("/", productController.getAllProduct);
+router.get("/", productController.getAllProductbyPage);
 router.get("/item/:id", productController.getProduct);
 router.use(isAuthenticated);
 
@@ -43,6 +26,25 @@ router.post("/create", productController.createProduct);
 router.put("/update", productController.updateProduct);
 // Product Category API's
 router.post("/createProCat", productController.createProductCategory);
-router.delete("/deleteProCat", productController.deleteProductCategory);
+router.post("/deleteProCat", productController.deleteProductCategory);
 
+/**
+ * Image Uploads
+ */
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, "../../Images"));
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+const upload = multer({ storage: storage });
+router.post(
+  "/images",
+  upload.array("myFile[]", 12),
+  productController.uploadImage
+);
+
+router.get("/images/:id", productController.getImagesById);
 export default router;
