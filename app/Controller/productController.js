@@ -69,7 +69,8 @@ productController.deleteCategory = async (req, res) => {
   }
 };
 
-productController.getProduct = async (req, res) => {
+productController.getProductByID = async (req, res) => {
+  const { id } = req.params;
   try {
     const products = await Products.findAll({
       attributes: {
@@ -94,7 +95,11 @@ productController.getProduct = async (req, res) => {
       ],
       where: {
         isActive: 1,
-        keepinstocktill: { [Op.gte]: Date.now() },
+        [Op.or]: [
+          { keepinstocktill: { [Op.gte]: Date.now() } },
+          { keepinstocktill: null },
+        ],
+        productCode: id,
       },
     });
     res.send({ status: 1, message: "", data: products });

@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 router.get("/", productController.getAllProductbyPage);
-router.get("/item/:id", productController.getProduct);
+router.get("/item/:id", productController.getProductByID);
 router.use(isAuthenticated);
 
 router.use(isAdmin);
