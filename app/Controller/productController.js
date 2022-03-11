@@ -159,7 +159,11 @@ productController.getAllProductbyPage = async (req, res) => {
 productController.getAllProductForAdmin = async (req, res) => {
   try {
     const products = await Products.findAll({
-      include: { all: true },
+      include: {
+        // all: true
+        model: Category,
+        through: ProductCategory,
+      },
       order: [["id", "DESC"]],
     });
     res.send({ status: 1, message: "", data: products });
@@ -169,7 +173,7 @@ productController.getAllProductForAdmin = async (req, res) => {
   }
 };
 
-productController.uploadImage = async (req, res, next) => {
+productController.uploadImageForProfile = async (req, res, next) => {
   const files = req.files;
   const data = JSON.parse(JSON.stringify(req.body));
   const { ProductId } = data;
@@ -181,16 +185,50 @@ productController.uploadImage = async (req, res, next) => {
         filename,
         filetype: mimetype,
         size,
-        category: AppConstant.CATEGORIES.ALL,
+        category: AppConstant.CATEGORIES.PROFILE,
         ProductId,
       }));
-      const createdData = await Images.bulkCreate(finalFileObject);
-
-      res.send({
-        status: 1,
-        message: "Image uploaded successfully!!",
-        data: createdData,
-      });
+      const getImage = await Images.findOne({ where: { ProductId } });
+      if (getImage) {
+        const file = getImage.toJSON().filename;
+        await fs.unlink(
+          `${path.join(__dirname, "../../Images/", file)}`,
+          (err) => {
+            if (err) {
+              console.log(err);
+            } else {
+              console.log(
+                `File >> ${file} - deleted successfully at ${new Date().toLocaleString()}`
+              );
+            }
+          }
+        );
+        const { filename, filetype, size, category, ProductId } =
+          finalFileObject[0];
+        const [updatedData] = await Images.update(
+          { filename, filetype, size, category },
+          { where: { ProductId } }
+        );
+        if (updatedData === 1) {
+          res.send({
+            status: 1,
+            message: "Image Updated successfully!!",
+          });
+        } else {
+          res.send({
+            status: 1,
+            message: "Some issue while updating images",
+          });
+        }
+      } else {
+        const createdData = await Images.bulkCreate(finalFileObject);
+        res.send({
+          status: 1,
+          message: "Image uploaded successfully!!",
+          data: createdData,
+        });
+      }
+      // console.log(getImage.toJSON());
     } catch (error) {
       next(error);
     }

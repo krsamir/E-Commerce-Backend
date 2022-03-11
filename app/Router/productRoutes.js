@@ -41,9 +41,9 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 router.post(
-  "/images",
+  "/images/profile",
   upload.array("myFile[]", 12),
-  productController.uploadImage
+  productController.uploadImageForProfile
 );
 
 router.get("/images/:id", productController.getImagesById);
