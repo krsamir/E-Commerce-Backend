@@ -188,7 +188,9 @@ productController.uploadImageForProfile = async (req, res, next) => {
         category: AppConstant.CATEGORIES.PROFILE,
         ProductId,
       }));
-      const getImage = await Images.findOne({ where: { ProductId } });
+      const getImage = await Images.findOne({
+        where: { ProductId, category: AppConstant.CATEGORIES.PROFILE },
+      });
       if (getImage) {
         const file = getImage.toJSON().filename;
         await fs.unlink(
@@ -228,7 +230,33 @@ productController.uploadImageForProfile = async (req, res, next) => {
           data: createdData,
         });
       }
-      // console.log(getImage.toJSON());
+    } catch (error) {
+      next(error);
+    }
+  }
+};
+
+productController.uploadImageForProduct = async (req, res, next) => {
+  const files = req.files;
+  const data = JSON.parse(JSON.stringify(req.body));
+  const { ProductId } = data;
+  if (files.length === 0) {
+    res.send({ status: 0, message: "No files to upload" });
+  } else {
+    try {
+      const finalFileObject = files.map(({ filename, size, mimetype }) => ({
+        filename,
+        filetype: mimetype,
+        size,
+        category: AppConstant.CATEGORIES.ALL,
+        ProductId,
+      }));
+      const createdData = await Images.bulkCreate(finalFileObject);
+      res.send({
+        status: 1,
+        message: "Product Images uploaded successfully!!",
+        data: createdData,
+      });
     } catch (error) {
       next(error);
     }
@@ -378,27 +406,34 @@ productController.deleteProductCategory = async (req, res, next) => {
 };
 
 productController.getImagesById = async (req, res, next) => {
-  const { id } = req.params;
+  const { ProductId } = req.params;
   try {
-    const data = await Products.findAll({ where: { id }, include: "Images" });
-    const image = JSON.parse(JSON.stringify(data));
-    const mappedImage = image.map((val) => {
-      return {
-        ...val,
-        Images: val.Images.map((val) => {
-          try {
-            const fileData = fs.readFileSync(
-              `${path.join(__dirname, "../../Images/", val.filename)}`,
-              "base64"
-            );
-            return { file: val.filename, data: fileData };
-          } catch (error) {
-            return { file: val.filename, data: null };
-          }
-        }),
-      };
+    // const data = await Products.findAll({ where: { id }, include: "Images" });
+    const data = await Images.findAll({
+      where: { ProductId },
+      attributes: ["filename", "category"],
     });
-    res.send({ images: "", data: mappedImage });
+    const image = JSON.parse(JSON.stringify(data));
+    const parsedImages = image.map(({ filename, category }) => {
+      try {
+        const fileData = fs.readFileSync(
+          `${path.join(__dirname, "../../Images/", filename)}`,
+          "base64"
+        );
+        return { file: filename, data: fileData, category };
+      } catch (error) {
+        return { file: filename, data: null, category: null };
+      }
+    });
+    const all = parsedImages.filter(
+      ({ category }) => category === AppConstant.CATEGORIES.ALL
+    );
+
+    const profile = parsedImages.filter(
+      ({ category }) => category === AppConstant.CATEGORIES.PROFILE
+    );
+
+    res.send({ all, profile });
   } catch (error) {
     next(error);
   }

@@ -45,6 +45,11 @@ router.post(
   upload.array("myFile[]", 12),
   productController.uploadImageForProfile
 );
+router.post(
+  "/images/all",
+  upload.array("myFile[]", 12),
+  productController.uploadImageForProduct
+);
 
-router.get("/images/:id", productController.getImagesById);
+router.get("/images/:ProductId", productController.getImagesById);
 export default router;
