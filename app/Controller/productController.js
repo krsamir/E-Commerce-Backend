@@ -411,18 +411,18 @@ productController.getImagesById = async (req, res, next) => {
     // const data = await Products.findAll({ where: { id }, include: "Images" });
     const data = await Images.findAll({
       where: { ProductId },
-      attributes: ["filename", "category"],
+      attributes: ["filename", "category", "id"],
     });
     const image = JSON.parse(JSON.stringify(data));
-    const parsedImages = image.map(({ filename, category }) => {
+    const parsedImages = image.map(({ filename, category, id }) => {
       try {
         const fileData = fs.readFileSync(
           `${path.join(__dirname, "../../Images/", filename)}`,
           "base64"
         );
-        return { file: filename, data: fileData, category };
+        return { file: filename, data: fileData, category, id };
       } catch (error) {
-        return { file: filename, data: null, category: null };
+        return { file: filename, data: null, category: null, id: null };
       }
     });
     const all = parsedImages.filter(
