@@ -72,9 +72,10 @@ productController.deleteCategory = async (req, res) => {
 productController.getProductByID = async (req, res) => {
   const { id } = req.params;
   try {
-    const products = await Products.findAll({
+    const products = await Products.findOne({
       attributes: {
         exclude: [
+          "id",
           "keepinstocktill",
           "createdby",
           "isActive",
@@ -102,7 +103,22 @@ productController.getProductByID = async (req, res) => {
         productCode: id,
       },
     });
-    res.send({ status: 1, message: "", data: products });
+    const parsedProduct = JSON.parse(JSON.stringify(products));
+    const mappedProducts = {
+      ...parsedProduct,
+      Images: parsedProduct.Images.map((val) => {
+        try {
+          const fileData = fs.readFileSync(
+            `${path.join(__dirname, "../../Images/", val.filename)}`,
+            "base64"
+          );
+          return { file: val.filename, data: fileData };
+        } catch (error) {
+          return { file: null, data: null };
+        }
+      }),
+    };
+    res.send({ status: 1, message: "", data: mappedProducts });
   } catch (error) {
     res.send({ status: 0, message: "Some issue while getting products." });
     console.log(error);
@@ -214,7 +230,7 @@ productController.uploadImageForProfile = async (req, res, next) => {
           finalFileObject[0];
         const [updatedData] = await Images.update(
           { filename, filetype, size, category },
-          { where: { ProductId } }
+          { where: { ProductId, category: AppConstant.CATEGORIES.PROFILE } }
         );
         if (updatedData === 1) {
           res.send({
@@ -223,7 +239,7 @@ productController.uploadImageForProfile = async (req, res, next) => {
           });
         } else {
           res.send({
-            status: 1,
+            status: 0,
             message: "Some issue while updating images",
           });
         }
