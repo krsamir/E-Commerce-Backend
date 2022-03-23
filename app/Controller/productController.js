@@ -106,6 +106,8 @@ productController.getProductByID = async (req, res) => {
     const parsedProduct = JSON.parse(JSON.stringify(products));
     const mappedProducts = {
       ...parsedProduct,
+      totalstocks:
+        parsedProduct.totalstocks < 4 ? parsedProduct.totalstocks : "instock",
       Images: parsedProduct.Images.map((val) => {
         try {
           const fileData = fs.readFileSync(
