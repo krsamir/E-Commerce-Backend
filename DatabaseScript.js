@@ -7,6 +7,7 @@ import Images from "./app/Model/Images.js";
 import Category from "./app/Model/Category.js";
 import Product from "./app/Model/Product.js";
 import ProductCategory from "./app/Model/ProductCategory.js";
+import Cart from "./app/Model/Cart.js";
 const Task = {};
 const log = console.log;
 Task.addAdminTable = () => {
@@ -103,6 +104,16 @@ Task.productCategoryJunction = () => {
   ProductCategory.sync()
     .then(() => {
       log(`Product Category Junction Table Created.`);
+    })
+    .catch((e) => {
+      log(e);
+    });
+};
+
+Task.CreateCart = () => {
+  Cart.sync()
+    .then(() => {
+      log(`Cart Junction Table Created.`);
     })
     .catch((e) => {
       log(e);

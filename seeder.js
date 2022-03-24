@@ -78,6 +78,14 @@ yargs.command({
     Task.productCategoryJunction();
   },
 });
+
+yargs.command({
+  command: "10",
+  describe: "10.Carts",
+  handler(argv) {
+    Task.CreateCart();
+  },
+});
 // yargs.command({
 //     command: "addadmin",
 //     describe: "Create Admin Table",
