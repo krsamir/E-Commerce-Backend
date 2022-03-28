@@ -3,6 +3,7 @@ import env from "dotenv";
 import loginRoutes from "./app/Router/loginRoutes.js";
 import userRoutes from "./app/Router/userRoutes.js";
 import productRoutes from "./app/Router/productRoutes.js";
+import transactionRoutes from "./app/Router/transactionRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -22,7 +23,12 @@ app.use(express.json());
 
 app.use((req, res, next) => {
   const { url, method, body } = req;
-  if (url.match("/user") || url.match("/auth") || url.match("/product")) {
+  if (
+    url.match("/user") ||
+    url.match("/auth") ||
+    url.match("/product") ||
+    url.match("/transaction")
+  ) {
     console.log(
       `[ METHOD: ${method}  ROUTE: ${url} at ${new Date().toLocaleString()} ]`
     );
@@ -40,6 +46,7 @@ app.use((req, res, next) => {
 app.use("/auth", loginRoutes);
 app.use("/user", userRoutes);
 app.use("/product", productRoutes);
+app.use("/transaction", transactionRoutes);
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.error(err);
