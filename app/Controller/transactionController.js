@@ -5,7 +5,7 @@ const transactionController = {};
 
 transactionController.getProfile = async (req, res) => {
   const userId = req.id;
-  const data = await User.findAndCountAll({
+  const { rows, count } = await User.findAndCountAll({
     where: userId,
     attributes: ["name"],
     include: [
@@ -16,6 +16,16 @@ transactionController.getProfile = async (req, res) => {
       },
     ],
   });
-  res.send(data);
+  const [item] = JSON.parse(JSON.stringify(rows));
+  const { Products: product, name } = item;
+  const data = product
+    .slice(0, 4)
+    .map(({ name, offerprice, actualprice, productCode }) => ({
+      name,
+      offerprice,
+      actualprice,
+      productCode,
+    }));
+  res.send({ count, name, data });
 };
 export default transactionController;
