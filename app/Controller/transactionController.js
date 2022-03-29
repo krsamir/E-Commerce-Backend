@@ -5,7 +5,7 @@ const transactionController = {};
 
 transactionController.getProfile = async (req, res) => {
   const userId = req.id;
-  const data = await User.findOne({
+  const data = await User.findAndCountAll({
     where: userId,
     attributes: ["name"],
     include: [
