@@ -3,9 +3,9 @@ import User from "../Model/User.js";
 import Cart from "../Model/Cart.js";
 const transactionController = {};
 
-transactionController.getProfile = async (req, res) => {
+transactionController.getCart = async (req, res) => {
   const userId = req.id;
-  const { rows, count } = await User.findAndCountAll({
+  const rows = await User.findAll({
     where: userId,
     attributes: ["name"],
     include: [
@@ -18,14 +18,18 @@ transactionController.getProfile = async (req, res) => {
   });
   const [item] = JSON.parse(JSON.stringify(rows));
   const { Products: product, name } = item;
-  const data = product
-    .slice(0, 4)
-    .map(({ name, offerprice, actualprice, productCode }) => ({
-      name,
-      offerprice,
-      actualprice,
-      productCode,
-    }));
-  res.send({ count, name, data });
+  if (product.length) {
+    const data = product
+      .slice(0, 4)
+      .map(({ name, offerprice, actualprice, productCode }) => ({
+        name,
+        offerprice,
+        actualprice,
+        productCode,
+      }));
+    res.send({ count: product.length, name, data });
+  } else {
+    res.send({ count: 0, name, data: [] });
+  }
 };
 export default transactionController;
