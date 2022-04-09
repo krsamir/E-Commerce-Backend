@@ -32,4 +32,41 @@ transactionController.getCart = async (req, res) => {
     res.send({ count: 0, name, data: [] });
   }
 };
+
+transactionController.addToCart = async (req, res, next) => {
+  const { productCode } = req.params;
+  try {
+    await Products.findOne({ where: { productCode } })
+      .then((data) => {
+        if (data) {
+          const addedData = data.toJSON();
+          const { id, name, offerprice, actualprice, productCode } = addedData;
+          Cart.create({ ProductId: id, UserId: req.id })
+            .then(() => {
+              res.send({
+                status: 1,
+                message: "Product added to cart.",
+                data: { name, offerprice, actualprice, productCode },
+              });
+            })
+            .catch((e) => {
+              if (e.name === "SequelizeUniqueConstraintError") {
+                res.send({
+                  status: 0,
+                  message: "Product is already in your cart.",
+                  // error: e.errors[0].message,
+                });
+              } else {
+                next(e);
+              }
+            });
+        } else {
+          res.send({ status: 0, message: "Unable to add to cart" });
+        }
+      })
+      .catch((e) => next(e));
+  } catch (error) {
+    next(error);
+  }
+};
 export default transactionController;

@@ -4,4 +4,5 @@ import { isAuthenticated } from "../MiddleWares/Authentication.js";
 const router = express.Router();
 router.use(isAuthenticated);
 router.get("/cart", transactionController.getCart);
+router.get("/addcart/:productCode", transactionController.addToCart);
 export default router;
