@@ -151,4 +151,24 @@ transactionController.getAllCart = async (req, res, next) => {
     next(error);
   }
 };
+
+transactionController.deleteCartItem = async (req, res, next) => {
+  try {
+    const value = await Cart.destroy({
+      where: { UserId: req.id, ProductId: req.params.id },
+    });
+    console.log(value);
+    if (value) {
+      res.send({ status: 1, message: "Item removed from cart.", value });
+    } else {
+      res.send({
+        status: 0,
+        message: "Unable to remove Item from Cart.",
+        value,
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 export default transactionController;

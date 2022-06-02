@@ -6,4 +6,5 @@ router.use(isAuthenticated);
 router.get("/cart", transactionController.getCart);
 router.get("/getAllCart", transactionController.getAllCart);
 router.get("/addcart/:productCode", transactionController.addToCart);
+router.delete("/cart/:id", transactionController.deleteCartItem);
 export default router;
