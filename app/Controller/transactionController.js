@@ -94,6 +94,7 @@ transactionController.getAllCart = async (req, res, next) => {
           model: Products,
           through: Cart,
           attributes: [
+            "id",
             "name",
             "offerprice",
             "actualprice",
@@ -121,7 +122,9 @@ transactionController.getAllCart = async (req, res, next) => {
           productCode,
           Images,
           totalstocks,
+          id,
         }) => ({
+          id,
           name,
           offerprice,
           actualprice,
